@@ -110,4 +110,15 @@ if (!process.env.VERCEL) {
   });
 }
 
+const fs = require("fs");
+
+app.get("/api/debug", (req, res) => {
+  const pub = path.join(__dirname, "public");
+  res.json({
+    dirname: __dirname,
+    rootFiles: fs.readdirSync(__dirname),
+    publicExists: fs.existsSync(pub),
+    publicFiles: fs.existsSync(pub) ? fs.readdirSync(pub) : []
+  });
+});
 module.exports = app;
