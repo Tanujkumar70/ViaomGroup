@@ -70,7 +70,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Serve public files (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, "Public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.post(
   "/api/enquiries",
