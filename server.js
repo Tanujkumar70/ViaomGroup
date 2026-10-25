@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -15,8 +13,13 @@ app.use(helmet());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 
-// Serve website files locally
+// Serve website files
 app.use(express.static(path.join(__dirname, "public")));
+
+// Home page
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // Rate limit enquiry submissions
 const enquiryLimiter = rateLimit({
@@ -100,11 +103,11 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-module.exports = app;
-
 // Start local server only on your computer
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Viaom Group website running at http://localhost:${PORT}`);
   });
 }
+
+module.exports = app;
