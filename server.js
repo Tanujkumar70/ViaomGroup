@@ -1,4 +1,5 @@
 
+
 const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -10,15 +11,12 @@ const PORT = process.env.PORT || 3000;
 // Security headers
 app.use(helmet());
 
-// Parse incoming form and JSON data
+// Parse JSON and form data
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 
-// Serve the website's static files locally.
-// Vercel can serve files from the root-level public/ folder.
-if (!process.env.VERCEL) {
-  app.use(express.static(path.join(__dirname, "public")));
-}
+// Serve website files locally
+app.use(express.static(path.join(__dirname, "public")));
 
 // Rate limit enquiry submissions
 const enquiryLimiter = rateLimit({
@@ -42,7 +40,6 @@ app.post("/api/enquiries", enquiryLimiter, (req, res) => {
     message
   } = req.body || {};
 
-  // Validate required fields and input types
   if (
     typeof name !== "string" ||
     typeof email !== "string" ||
@@ -59,7 +56,6 @@ app.post("/api/enquiries", enquiryLimiter, (req, res) => {
     });
   }
 
-  // Limit input lengths
   if (
     name.length > 100 ||
     email.length > 254 ||
@@ -73,7 +69,6 @@ app.post("/api/enquiries", enquiryLimiter, (req, res) => {
     });
   }
 
-  // Validate email format
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     return res.status(400).json({
       success: false,
@@ -81,7 +76,7 @@ app.post("/api/enquiries", enquiryLimiter, (req, res) => {
     });
   }
 
-  // Temporary handling: log the enquiry on the server
+  // Temporary enquiry handling: server logs only
   console.log("New Viaom Group enquiry:", {
     name: name.trim(),
     email: email.trim(),
@@ -97,7 +92,7 @@ app.post("/api/enquiries", enquiryLimiter, (req, res) => {
   });
 });
 
-// Basic health-check endpoint
+// Health-check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -105,10 +100,9 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Export Express app for Vercel
 module.exports = app;
 
-// Run a local server when developing on your computer
+// Start local server only on your computer
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Viaom Group website running at http://localhost:${PORT}`);
